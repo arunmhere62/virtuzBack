@@ -87,7 +87,6 @@ const blogList = async (req, res) => {
             return blog;
         });
 
-        console.log(blogs); // Log the blogs array to inspect image URLs
 
         res.json(blogs);
     } catch (err) {

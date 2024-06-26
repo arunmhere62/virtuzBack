@@ -25,12 +25,12 @@ app.use("public", express.static('public'));
 
 // Define routes
 app.post("/login", userLogin);
-app.use("/user", userRouter);
 app.get("/refresh", handleRefreshToken);
 app.use(verifyJWT); // Applying middleware globally
 
 app.use("/blog", blogRouter);
 app.use("/userProfile", userProfileRouter);
+// app.use("/user", userRouter);
 
 
 // Connect to MongoDB

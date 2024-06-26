@@ -6,10 +6,10 @@ import verifyToken from '../middleware/authorization.js';
 
 const router = express.Router();
 router.post("/register", userRegistration);
-router.get("/login", getUserData);
-router.put("/:id", updateUserData);
-router.get("/allUser", getAllUsers);
-router.get("/:id", getUserByNameOrId);
+router.post("/get", getUserData);
+router.post("/:id", updateUserData);
+router.post("/list", getAllUsers);
+router.post("/:id", getUserByNameOrId);
 
 export default router;
 
