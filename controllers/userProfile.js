@@ -32,6 +32,7 @@ const getUserProfileByUsername = async (req, res) => {
 
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
 const updateUserProfileById = async (req, res) => {
     const { id } = req.params;
 
@@ -40,11 +41,6 @@ const updateUserProfileById = async (req, res) => {
     }
 
     try {
-        // Check if password needs to be hashed
-        if (req.body.password) {
-            req.body.password = await bcrypt.hash(req.body.password, 10);
-        }
-
         const updatedUser = await UserLogin.findByIdAndUpdate(
             id,
             req.body,

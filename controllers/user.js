@@ -4,20 +4,24 @@ import crypto from 'crypto';
 import bcrypt from "bcrypt";
 
 // ! ------ login -------
-
 const userLogin = async (req, res) => {
-    console.log("hello");
     const { username, password } = req.body;
-    console.log("hello", username);
-    if (!username || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
+
+    if (!username || !password) {
+        return res.status(400).json({ 'message': 'Username and password are required.' });
+    }
 
     try {
         const foundUser = await UserLogin.findOne({ username }).exec();
-        if (!foundUser) return res.sendStatus(401); // Unauthorized 
 
-        // Evaluate password
-        const match = await bcrypt.compare(password, foundUser.password);
-        if (!match) return res.sendStatus(401);
+        if (!foundUser) {
+            return res.sendStatus(401); // Unauthorized
+        }
+
+        // Compare passwords without hashing
+        if (foundUser.password !== password) {
+            return res.sendStatus(401);
+        }
 
         // Create access token
         const accessToken = jwt.sign(
@@ -27,7 +31,7 @@ const userLogin = async (req, res) => {
                 }
             },
             "secret-key",
-            { expiresIn: '6h' }
+            { expiresIn: '30d' }
         );
 
         // Check if the user already has a refresh token
@@ -78,15 +82,12 @@ const userRegistration = async (req, res) => {
             return res.status(400).json({ message: 'Username already taken' });
         }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create a new user
+        // Create a new user without hashing the password
         const newUser = new UserLogin({
             username,
             email,
             dob,
-            password: hashedPassword,
+            password, // Store password as plain text (not recommended for production)
             address,
             city,
             state,
@@ -99,6 +100,7 @@ const userRegistration = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
 
 // -----------------------------to update all users-----------------------------------
 const updateUserData = async (req, res) => {
