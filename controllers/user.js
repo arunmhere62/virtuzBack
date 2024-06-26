@@ -15,10 +15,9 @@ const userLogin = async (req, res) => {
         const foundUser = await UserLogin.findOne({ username }).exec();
 
         if (!foundUser) {
-            return res.sendStatus(401); // Unauthorized
+            return res.sendStatus(401);
         }
 
-        // Compare passwords without hashing
         if (foundUser.password !== password) {
             return res.sendStatus(401);
         }
@@ -34,33 +33,29 @@ const userLogin = async (req, res) => {
             { expiresIn: '30d' }
         );
 
-        // Check if the user already has a refresh token
         let refreshToken = foundUser.refreshToken.find(token => {
             try {
                 jwt.verify(token, "secret-key");
-                return true; // Token is valid
+                return true;
             } catch (err) {
                 if (err.name === 'TokenExpiredError') {
-                    return false; // Token has expired
+                    return false;
                 } else {
-                    throw err; // Other token verification errors
+                    throw err;
                 }
             }
         });
 
         if (!refreshToken) {
-            // Generate a new refresh token
             refreshToken = jwt.sign(
                 { "username": foundUser.username },
                 "secret-key",
                 { expiresIn: '30d' }
             );
-            // Update user's refresh tokens
             foundUser.refreshToken.push(refreshToken);
             await foundUser.save();
         }
 
-        // Return user details along with the access token and refresh token in the response body
         const userDetails = foundUser.toObject();
         res.json({ ...userDetails, accessToken, refreshToken });
     } catch (error) {
@@ -74,7 +69,6 @@ const userRegistration = async (req, res) => {
     const { username, email, dob, password, address, city, state, job } = req.body;
 
     try {
-        // Check if username or email already exists
         const existingUser = await UserLogin.findOne({
             $or: [{ username }]
         });
@@ -82,12 +76,11 @@ const userRegistration = async (req, res) => {
             return res.status(400).json({ message: 'Username already taken' });
         }
 
-        // Create a new user without hashing the password
         const newUser = new UserLogin({
             username,
             email,
             dob,
-            password, // Store password as plain text (not recommended for production)
+            password,
             address,
             city,
             state,
