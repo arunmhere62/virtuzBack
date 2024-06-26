@@ -6,7 +6,9 @@ import bcrypt from "bcrypt";
 // ! ------ login -------
 
 const userLogin = async (req, res) => {
+    console.log("hello");
     const { username, password } = req.body;
+    console.log("hello", username);
     if (!username || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
 
     try {
